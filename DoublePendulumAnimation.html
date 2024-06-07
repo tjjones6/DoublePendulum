@@ -1,0 +1,405 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>DoublePendulumAnimation</title><meta name="generator" content="MATLAB 9.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2024-06-06"><meta name="DC.source" content="DoublePendulumAnimation.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Double Pendulum Simulation</a></li><li><a href="#2">User Input</a></li><li><a href="#3">Numerical Integration using ODE45</a></li><li><a href="#4">Animation</a></li><li><a href="#5">Plotting Results</a></li><li><a href="#6">Define the function for the double pendulum ODEs</a></li><li><a href="#7">Reference Functions for Plotting</a></li></ul></div><h2 id="1">Double Pendulum Simulation</h2><p>Author:      Tyler Jones Contact:     <a href="mailto:tjjones6@wisc.edu">tjjones6@wisc.edu</a> Institution: University of Wisconsin-Madison Date:          05.27.2024</p><p>Description: This code simulates a double pendulum using RK45 (ode45) as the chosen numerical scheme. The pendulum's trajectory is then mapped onto an animation figure. Finally, plots of angular evolution, angular velocity evolution, and respective phase spaces are generated.</p><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>; clc;
+</pre><h2 id="2">User Input</h2><p>Define Parameters</p><pre class="codeinput">g = 9.81;  <span class="comment">% Acceleration due to gravity (m/s^2)</span>
+L1 = 1.0;  <span class="comment">% Length of the first pendulum arm (m)</span>
+L2 = 1.0;  <span class="comment">% Length of the second pendulum arm (m)</span>
+m1 = 1.0;  <span class="comment">% Mass of the first pendulum bob (kg)</span>
+m2 = 1.0;  <span class="comment">% Mass of the second pendulum bob (kg)</span>
+
+<span class="comment">% Initial Conditions</span>
+theta1_0 = pi/2;  <span class="comment">% Initial angle of the first pendulum (radians)</span>
+theta2_0 = pi/2;  <span class="comment">% Initial angle of the second pendulum (radians)</span>
+omega1_0 = 0;      <span class="comment">% Initial angular velocity of the first pendulum (rad/s)</span>
+omega2_0 = 0;      <span class="comment">% Initial angular velocity of the second pendulum (rad/s)</span>
+
+<span class="comment">% Time Settings</span>
+tspan = [0 25];  <span class="comment">% Extend the time span for simulation (seconds)</span>
+</pre><h2 id="3">Numerical Integration using ODE45</h2><pre class="codeinput">options = odeset(<span class="string">'RelTol'</span>, 1e-6, <span class="string">'AbsTol'</span>, 1e-6);
+[t, y] = ode45(@(t, y) doublePendulumODE(t, y, g, L1, L2, m1, m2), tspan, [theta1_0, omega1_0, theta2_0, omega2_0], options);
+
+<span class="comment">% Extracting and Converting Data</span>
+theta1 = y(:, 1);
+theta2 = y(:, 3);
+
+x1 = L1*sin(theta1);
+y1 = -L1*cos(theta1);
+x2 = x1 + L2*sin(theta2);
+y2 = y1 - L2*cos(theta2);
+</pre><h2 id="4">Animation</h2><p>Initialize an array to store frames for the animation</p><pre class="codeinput">frames = [];
+
+<span class="comment">% Create a figure for the animation (The figure will initially display as empty)</span>
+animationFig = figure(<span class="string">'units'</span>,<span class="string">'normalized'</span>,<span class="string">'Position'</span>,[0.1 0.1 .8 .8]);
+myfigpref
+
+<span class="comment">% Storing animation data</span>
+<span class="comment">% myWriter = VideoWriter('DoublePendulumAnimation.mp4', 'MPEG-4');</span>
+<span class="comment">% myWriter.FrameRate = 30;</span>
+<span class="comment">% open(myWriter);</span>
+
+<span class="comment">% Set manual axes limits for animation</span>
+animationLimits = [-2.5 2.5 -2.5 1];  <span class="comment">% Adjust as needed</span>
+
+<span class="comment">% Set initial axes limits</span>
+axis(animationLimits);
+
+<span class="keyword">for</span> i = 1:length(t)
+    <span class="comment">% Plot the trajectory</span>
+    plot(x2(1:i), y2(1:i), <span class="string">'Color'</span>,[0.1 0.1 0.1 0.2])
+    <span class="keyword">if</span> i &gt; 20
+        plot(x2(i-20:i), y2(i-20:i), <span class="string">'-r'</span>)
+    <span class="keyword">end</span>
+
+    <span class="comment">% Update the position of the pendulum bobs and rods in the animation plot</span>
+    plot([0, x1(i)], [0, y1(i)], <span class="string">'k'</span>, <span class="string">'LineWidth'</span>, 2);  <span class="comment">% Rod for Pendulum 1</span>
+    hold <span class="string">on</span>;
+    plot([x1(i), x2(i)], [y1(i), y2(i)], <span class="string">'k'</span>, <span class="string">'LineWidth'</span>, 2);  <span class="comment">% Rod for Pendulum 2</span>
+    plot(x1(i), y1(i), <span class="string">'bo'</span>, <span class="string">'MarkerSize'</span>, 10, <span class="string">'MarkerFaceColor'</span>, <span class="string">'b'</span>);  <span class="comment">% Mass for Pendulum 1</span>
+    plot(x2(i), y2(i), <span class="string">'ro'</span>, <span class="string">'MarkerSize'</span>, 10, <span class="string">'MarkerFaceColor'</span>, <span class="string">'r'</span>);  <span class="comment">% Mass for Pendulum 2</span>
+    fig_xytit(<span class="string">'x-axis'</span>,<span class="string">'y-axis'</span>,[<span class="string">'Double Pendulum Animation - Time: '</span>, num2str(t(i), <span class="string">'%.2f'</span>), <span class="string">'s'</span>])
+
+    <span class="comment">% Set initial y-axis limits</span>
+    ylim(animationLimits(3:4));
+    xlim(animationLimits(1:2));
+
+    <span class="comment">% Capture the current frame for the animation</span>
+    frame = getframe(animationFig);
+    frames = [frames, frame];
+<span class="comment">%     writeVideo(myWriter,frame);</span>
+
+    <span class="comment">% Clear the previous frame in the animation plot</span>
+    <span class="keyword">if</span> i &lt; length(t)
+        cla(animationFig);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Close the animation figure</span>
+<span class="comment">% close(animationFig);</span>
+<span class="comment">% close(myWriter)</span>
+
+<span class="comment">% Display the animation</span>
+<span class="comment">% figure('units','normalized','Position',[0.1 0.1 .8 .8])</span>
+<span class="comment">% movie(frames, 1, 30);  % Play the animation at 30 frames per second</span>
+</pre><img vspace="5" hspace="5" src="DoublePendulumAnimation_02.png" alt=""> <h2 id="5">Plotting Results</h2><p>Plot angle evolution</p><pre class="codeinput">figure(<span class="string">'units'</span>,<span class="string">'normalized'</span>,<span class="string">'Position'</span>,[0.1 0.1 .8 .8])
+hold <span class="string">on</span>; grid <span class="string">on</span>;
+myfigpref
+plot(t, y(:, 1), t, y(:, 3))
+fig_xytit(<span class="string">'Time (s)'</span>, <span class="string">'Angle (rad)'</span>, <span class="string">'Double Pendulum Motion'</span>);
+legend(<span class="string">'\phi_1'</span>, <span class="string">'\phi_2'</span>);
+hold <span class="string">off</span>;
+
+<span class="comment">% Plot angular velocity evolution</span>
+figure(<span class="string">'units'</span>,<span class="string">'normalized'</span>,<span class="string">'Position'</span>,[0.1 0.1 .8 .8])
+hold <span class="string">on</span>; grid <span class="string">on</span>;
+myfigpref
+plot(t, y(:, 2), t, y(:, 4))
+fig_xytit(<span class="string">'Time (s)'</span>, <span class="string">'$\dot{\phi}$ (rad/s)'</span>, <span class="string">'Angular Velocity Evolution'</span>)
+legend(<span class="string">'\phi_1\_dot'</span>, <span class="string">'\phi_2\_dot'</span>);
+hold <span class="string">off</span>;
+
+<span class="comment">% Phase Space of Pendulum 1</span>
+figure(<span class="string">'units'</span>,<span class="string">'normalized'</span>,<span class="string">'Position'</span>,[0.1 0.1 .8 .8])
+hold <span class="string">on</span>; grid <span class="string">on</span>; axis <span class="string">padded</span>;
+myfigpref
+plot(y(:,1), y(:,3))
+fig_xytit(<span class="string">'$\phi_1$ (rad)'</span>, <span class="string">'$\dot{\phi_1}$ (rad/s)'</span>, <span class="string">'$\phi_1$ Phase Space'</span>)
+hold <span class="string">off</span>;
+
+<span class="comment">% Phase Space of Pendulum 2</span>
+figure(<span class="string">'units'</span>,<span class="string">'normalized'</span>,<span class="string">'Position'</span>,[0.1 0.1 .8 .8])
+hold <span class="string">on</span>; grid <span class="string">on</span>; axis <span class="string">padded</span>;
+myfigpref
+plot(y(:,2), y(:,4))
+fig_xytit(<span class="string">'$\phi_2$ (rad)'</span>, <span class="string">'$\dot{\phi_2}$ (rad/s)'</span>, <span class="string">'$\phi_2$ Phase Space'</span>)
+hold <span class="string">off</span>;
+</pre><img vspace="5" hspace="5" src="DoublePendulumAnimation_03.png" alt=""> <img vspace="5" hspace="5" src="DoublePendulumAnimation_04.png" alt=""> <img vspace="5" hspace="5" src="DoublePendulumAnimation_05.png" alt=""> <img vspace="5" hspace="5" src="DoublePendulumAnimation_06.png" alt=""> <h2 id="6">Define the function for the double pendulum ODEs</h2><pre class="codeinput"><span class="keyword">function</span> dydt = doublePendulumODE(~, y, g, L1, L2, m1, m2)
+    <span class="comment">% Unpack the state variables</span>
+    theta1 = y(1);
+    omega1 = y(2);
+    theta2 = y(3);
+    omega2 = y(4);
+
+    <span class="comment">% Equations of motion for the double pendulum</span>
+    dydt = zeros(4, 1); <span class="comment">% empty row vector</span>
+    dydt(1) = omega1;
+    dydt(2) = (-g * (2 * m1 + m2) * sin(theta1) - m2 * g * sin(theta1 - 2 * theta2) - 2 * sin(theta1 - theta2) * m2 * (omega2^2 * L2 + omega1^2 * L1 * cos(theta1 - theta2))) / (L1 * (2 * m1 + m2 - m2 * cos(2 * theta1 - 2 * theta2)));
+    dydt(3) = omega2;
+    dydt(4) = (2 * sin(theta1 - theta2) * (omega1^2 * L1 * (m1 + m2) + g * (m1 + m2) * cos(theta1) + omega2^2 * L2 * m2 * cos(theta1 - theta2))) / (L2 * (2 * m1 + m2 - m2 * cos(2 * theta1 - 2 * theta2)));
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="DoublePendulumAnimation_01.png" alt=""> <h2 id="7">Reference Functions for Plotting</h2><pre class="codeinput"><span class="keyword">function</span> myfigpref
+    set(0, <span class="string">'DefaultAxesFontSize'</span>, 20);
+    set(0, <span class="string">'DefaultAxesLineWidth'</span>, 2);
+    set(0, <span class="string">'DefaultLineLineWidth'</span>, 2);
+    set(0, <span class="string">'DefaultPatchLineWidth'</span>, .7);
+    set(0, <span class="string">'DefaultLineMarkerSize'</span>, 6);
+    grid <span class="string">on</span>;
+    box <span class="string">on</span>;
+    h = gca;
+    h.TickLabelInterpreter=<span class="string">'latex'</span>;
+    h.MinorGridAlpha=0.05;
+    h.GridAlpha=0.05;
+    h.FontSize=25;
+    h.LineWidth=2;
+    h = gcf;
+    h.Color = [1,1,1];
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> fig_xytit(xlab, ylab, tit)
+    <span class="keyword">if</span> nargin &lt; 3
+        tit = <span class="string">''</span>;
+    <span class="keyword">end</span>
+    xlabel(xlab, <span class="string">'interpreter'</span>, <span class="string">'latex'</span>);
+    ylabel(ylab, <span class="string">'interpreter'</span>, <span class="string">'latex'</span>);
+    title(tit, <span class="string">'interpreter'</span>, <span class="string">'latex'</span>);
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2022b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Double Pendulum Simulation
+% Author:      Tyler Jones
+% Contact:     tjjones6@wisc.edu
+% Institution: University of Wisconsin-Madison
+% Date:          05.27.2024
+% 
+% Description: 
+% This code simulates a double pendulum using RK45 (ode45) as
+% the chosen numerical scheme. The pendulum's trajectory is then mapped onto
+% an animation figure. Finally, plots of angular evolution, angular
+% velocity evolution, and respective phase spaces are generated.
+
+clear all; close all; clc;
+
+%% User Input
+% Define Parameters
+g = 9.81;  % Acceleration due to gravity (m/s^2)
+L1 = 1.0;  % Length of the first pendulum arm (m)
+L2 = 1.0;  % Length of the second pendulum arm (m)
+m1 = 1.0;  % Mass of the first pendulum bob (kg)
+m2 = 1.0;  % Mass of the second pendulum bob (kg)
+
+% Initial Conditions
+theta1_0 = pi/2;  % Initial angle of the first pendulum (radians)
+theta2_0 = pi/2;  % Initial angle of the second pendulum (radians)
+omega1_0 = 0;      % Initial angular velocity of the first pendulum (rad/s)
+omega2_0 = 0;      % Initial angular velocity of the second pendulum (rad/s)
+
+% Time Settings
+tspan = [0 25];  % Extend the time span for simulation (seconds)
+
+%% Numerical Integration using ODE45
+options = odeset('RelTol', 1e-6, 'AbsTol', 1e-6);
+[t, y] = ode45(@(t, y) doublePendulumODE(t, y, g, L1, L2, m1, m2), tspan, [theta1_0, omega1_0, theta2_0, omega2_0], options);
+
+% Extracting and Converting Data
+theta1 = y(:, 1);
+theta2 = y(:, 3);
+
+x1 = L1*sin(theta1);
+y1 = -L1*cos(theta1);
+x2 = x1 + L2*sin(theta2);
+y2 = y1 - L2*cos(theta2);
+
+%% Animation
+% Initialize an array to store frames for the animation
+frames = [];
+
+% Create a figure for the animation (The figure will initially display as empty)
+animationFig = figure('units','normalized','Position',[0.1 0.1 .8 .8]);
+myfigpref
+
+% Storing animation data
+% myWriter = VideoWriter('DoublePendulumAnimation.mp4', 'MPEG-4');
+% myWriter.FrameRate = 30;
+% open(myWriter);
+
+% Set manual axes limits for animation
+animationLimits = [-2.5 2.5 -2.5 1];  % Adjust as needed
+
+% Set initial axes limits
+axis(animationLimits);
+
+for i = 1:length(t)
+    % Plot the trajectory
+    plot(x2(1:i), y2(1:i), 'Color',[0.1 0.1 0.1 0.2])
+    if i > 20
+        plot(x2(i-20:i), y2(i-20:i), '-r')
+    end
+
+    % Update the position of the pendulum bobs and rods in the animation plot
+    plot([0, x1(i)], [0, y1(i)], 'k', 'LineWidth', 2);  % Rod for Pendulum 1
+    hold on;
+    plot([x1(i), x2(i)], [y1(i), y2(i)], 'k', 'LineWidth', 2);  % Rod for Pendulum 2
+    plot(x1(i), y1(i), 'bo', 'MarkerSize', 10, 'MarkerFaceColor', 'b');  % Mass for Pendulum 1
+    plot(x2(i), y2(i), 'ro', 'MarkerSize', 10, 'MarkerFaceColor', 'r');  % Mass for Pendulum 2
+    fig_xytit('x-axis','y-axis',['Double Pendulum Animation - Time: ', num2str(t(i), '%.2f'), 's'])
+    
+    % Set initial y-axis limits
+    ylim(animationLimits(3:4));
+    xlim(animationLimits(1:2));
+
+    % Capture the current frame for the animation
+    frame = getframe(animationFig);
+    frames = [frames, frame];
+%     writeVideo(myWriter,frame);
+
+    % Clear the previous frame in the animation plot
+    if i < length(t)
+        cla(animationFig);
+    end
+end
+
+% Close the animation figure
+% close(animationFig);
+% close(myWriter)
+
+% Display the animation
+% figure('units','normalized','Position',[0.1 0.1 .8 .8])
+% movie(frames, 1, 30);  % Play the animation at 30 frames per second
+
+%% Plotting Results
+% Plot angle evolution
+figure('units','normalized','Position',[0.1 0.1 .8 .8])
+hold on; grid on;
+myfigpref
+plot(t, y(:, 1), t, y(:, 3))
+fig_xytit('Time (s)', 'Angle (rad)', 'Double Pendulum Motion');
+legend('\phi_1', '\phi_2');
+hold off;
+
+% Plot angular velocity evolution
+figure('units','normalized','Position',[0.1 0.1 .8 .8])
+hold on; grid on;
+myfigpref
+plot(t, y(:, 2), t, y(:, 4))
+fig_xytit('Time (s)', '$\dot{\phi}$ (rad/s)', 'Angular Velocity Evolution')
+legend('\phi_1\_dot', '\phi_2\_dot');
+hold off;
+
+% Phase Space of Pendulum 1
+figure('units','normalized','Position',[0.1 0.1 .8 .8])
+hold on; grid on; axis padded;
+myfigpref
+plot(y(:,1), y(:,3))
+fig_xytit('$\phi_1$ (rad)', '$\dot{\phi_1}$ (rad/s)', '$\phi_1$ Phase Space')
+hold off;
+
+% Phase Space of Pendulum 2
+figure('units','normalized','Position',[0.1 0.1 .8 .8])
+hold on; grid on; axis padded;
+myfigpref
+plot(y(:,2), y(:,4))
+fig_xytit('$\phi_2$ (rad)', '$\dot{\phi_2}$ (rad/s)', '$\phi_2$ Phase Space')
+hold off;
+
+%% Define the function for the double pendulum ODEs
+function dydt = doublePendulumODE(~, y, g, L1, L2, m1, m2)
+    % Unpack the state variables
+    theta1 = y(1);
+    omega1 = y(2);
+    theta2 = y(3);
+    omega2 = y(4);
+
+    % Equations of motion for the double pendulum
+    dydt = zeros(4, 1); % empty row vector
+    dydt(1) = omega1;
+    dydt(2) = (-g * (2 * m1 + m2) * sin(theta1) - m2 * g * sin(theta1 - 2 * theta2) - 2 * sin(theta1 - theta2) * m2 * (omega2^2 * L2 + omega1^2 * L1 * cos(theta1 - theta2))) / (L1 * (2 * m1 + m2 - m2 * cos(2 * theta1 - 2 * theta2)));
+    dydt(3) = omega2;
+    dydt(4) = (2 * sin(theta1 - theta2) * (omega1^2 * L1 * (m1 + m2) + g * (m1 + m2) * cos(theta1) + omega2^2 * L2 * m2 * cos(theta1 - theta2))) / (L2 * (2 * m1 + m2 - m2 * cos(2 * theta1 - 2 * theta2)));
+end
+
+%% Reference Functions for Plotting
+function myfigpref
+    set(0, 'DefaultAxesFontSize', 20);
+    set(0, 'DefaultAxesLineWidth', 2);
+    set(0, 'DefaultLineLineWidth', 2);
+    set(0, 'DefaultPatchLineWidth', .7);
+    set(0, 'DefaultLineMarkerSize', 6);
+    grid on;
+    box on;
+    h = gca;
+    h.TickLabelInterpreter='latex';
+    h.MinorGridAlpha=0.05;
+    h.GridAlpha=0.05;
+    h.FontSize=25;
+    h.LineWidth=2;
+    h = gcf;
+    h.Color = [1,1,1];
+end
+
+function fig_xytit(xlab, ylab, tit)
+    if nargin < 3
+        tit = '';
+    end
+    xlabel(xlab, 'interpreter', 'latex');
+    ylabel(ylab, 'interpreter', 'latex');
+    title(tit, 'interpreter', 'latex');
+end
+
+##### SOURCE END #####
+--></body></html>
