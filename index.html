@@ -150,25 +150,109 @@
     \ddot{\theta_2} + \ddot{\theta_1}\cos(\theta_1 - \theta_2) + \frac{g}{l}\sin\theta_2 - \dot{\theta_1}(\dot{\theta_1} + \dot{\theta_2})\sin(\theta_1 - \theta_2) = 0
     $$
 
-  </p>
-
-  <p style="text-indent: 30px;">
+ 
     To solve for \( \ddot{\theta_1} \) and \( \ddot{\theta_2} \) in terms of \( \theta_1 \), \( \dot{\theta_1} \), \( \theta_2 \), and \( \dot{\theta_2} \), 
-    we use the final expressions above. This can be done by hand or by using a solver.
+    we use the final expressions above. This can be done by hand or by using an equation solver.
   
     The equations of motion for \( \ddot{\theta_1} \) and \( \ddot{\theta_2} \) are then given by:
     
 
     $$
-\boxed{
+\begin{cases}
 \begin{aligned}
 \ddot{\theta_1} &= \frac{-2g\sin\theta_1 - g\sin(\theta_1 - 2\theta_2) - 2\sin(\theta_1 - \theta_2)(\dot{\theta_2}^2 l + \dot{\theta_1}^2l\cos(\theta_1 - \theta_2))}{2l(2 - \cos(2\theta_1 - 2\theta_2))} \\
 \ddot{\theta_2} &= \frac{2\sin(\theta_1 - \theta_2)(2\dot{\theta_1}^2l + 2g\cos\theta_1 + \dot{\theta_2}^2l\cos(\theta_1 - \theta_2))}{2l(2 - \cos(2\theta_1 - 2\theta_2))}
 \end{aligned}
-}
+\end{cases}
 $$
 
+Note that we are note quite finished. Since we will be using a higher (4th) order scheme to numerically 
+integrate the equations of motion, we need to rewrite the system with four first-order equations as follows.
+To be clear, \(\omega_i \) will be the dummy variable representing \(\dot{\theta_i} \).
+
+$$
+\boxed{
+\begin{aligned}
+\omega_1 &= \dot{\theta_1} \\
+\omega_2 &= \dot{\theta_2} \\
+\dot{\omega_1} &= \frac{-2g\sin\theta_1 - g\sin(\theta_1 - 2\theta_2) - 2\sin(\theta_1 - \theta_2)(\omega_2^2 l + \omega_1^2l\cos(\theta_1 - \theta_2))}{2l(2 - \cos(2\theta_1 - 2\theta_2))} \\
+\dot{\omega_2} &= \frac{2\sin(\theta_1 - \theta_2)(2\omega_1^2l + 2g\cos\theta_1 + \omega_2^2l\cos(\theta_1 - \theta_2))}{2l(2 - \cos(2\theta_1 - 2\theta_2))}
+\end{aligned}
+  }
+$$
+
+Before employing numerical methods (Runge-Kutta 4 with adaptive stepsizes), I would like to use Hamiltonian formalisms to predict regions where
+it is energetically impossible for the second pendulum to 'flip'. Recall that the conjugate momenta of our system was derived above, but here it is again.
+
+$$
+\begin{aligned}
+    p_{\theta_1} &= \frac{\partial L}{\partial \dot{\theta_1}} = ml^2(2\dot{\theta_1} + \dot{\theta_2}\cos(\theta_1 - \theta_2)) \\
+    p_{\theta_2} &= \frac{\partial L}{\partial \dot{\theta_2}} = ml^2(\dot{\theta_2} + \dot{\theta_1}\cos(\theta_1 - \theta_2))
+    \end{aligned}
+$$
+
+If we were to follow the exact method used in the inspired research paper, we would also use the following equations of motion that we have already found above.
+
+$$
+\begin{aligned}
+    \dot{p_{\theta_1}} &= \frac{\partial L}{\partial \theta_1} = -mgl(2\sin\theta_1) - ml^2(\dot{\theta_1}\dot{\theta_2}\sin(\theta_1 - \theta_2)) \\
+    \dot{p_{\theta_2}} &= \frac{\partial L}{\partial \theta_2} = -mgl\sin\theta_2 - ml^2(\dot{\theta_1}\dot{\theta_2}\sin(\theta_1 - \theta_2))
+    \end{aligned}
+$$
+
+Since we are limiting the limbs/rods to be motionless at \(t=0 \), the initial Hamiltonian will be as follows.
+Note that the Lagrangian is not explicitly dependent on time which means the Hamiltonian is thus converved.
+
+$$ H_0:=T+V=0+V=V \Rightarrow \boxed{H_0 = -mgl(2\cos\theta_1 + \cos\theta_2)}$$
+
+To maximize our \(H_0 \) we let \(\theta_1=\theta_2=\pi \):
+$$
+H_0 = -mgl(2\cos\theta_1 + \cos\theta_2)> -mgl
+$$
+
+Rearranging yields the curve in which it is energetically impossible for either pendulum to flip:
+$$
+2\cos\theta_1 + \cos\theta_2 = 1\\
+\boxed{\theta_2 = \arccos(1-2\cos\theta_1)}
+$$
+
+<div style="text-align: center;">
+  <img src="EnergeticsCurve.jpg" style="width: 75%;">
+</div>
+
+The figure above (what I will call the 'energetics curve') displays a large island where neither pendulum has enough energy to 'flip' inside the region. This fact 
+holds true for late time which will later be confirmed with a numerical analysis. In order to estimate when the second pendulum will 'flip', I will create
+a fractal map. For now, we will first familiarize ourselves with the systems behavior.
   </p>
+
+  <h3 style="margin: 0%; text-decoration: underline;">
+    Numerical Analysis
+  </h3>
+  <p style="text-indent: 30px;">
+   To start my analysis, I have numerically solved the equations of motion for a simple initial condition: \(\theta_1=\theta_2=\frac{\pi}{2} \).
+   We note that this particulat initial condition resides outside of the energetically stable island; hence, we can expect the pendulum to flip in finite 
+   time.
+   $$ $$
+
+   <video width="75%" style="margin-left: 12.5%;" controls>
+    <source src="DoublePendulumAnim.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  $$ $$
+
+  Clearly, we can see that this system is chaotic; however, one might question if the trajectory would be drastically effected if we
+  give the initial conditions an extremely small perturbation? To prove that this system is chaotic and extremely dependent on initial conditions, I will re-run the 
+  simulation, but with another pendulum slightly perturbed. I will keep the same angle \(\theta_1 \); however, I will add the perturbation \(\epsilon = 0.01 \). Hence, \(\theta_2 = \frac{\pi}{2}+\epsilon \).
+
+  $$
+  $$
+
+  <video width="75%" style="margin-left: 12.5%;" controls>
+    <source src="DoublePendulumPerturbationAnimationx4.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  </p>
+
 
 </body>
 
