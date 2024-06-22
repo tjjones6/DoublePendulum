@@ -220,13 +220,13 @@ $$
   <img src="EnergeticsCurve.jpg" style="width: 75%;">
 </div>
 
-The figure above (what I will call the 'energetics curve') displays a large island where neither pendulum has enough energy to 'flip' inside the region. This fact 
+The figure above (what I will call the 'energetics map') displays a large island where neither pendulum has enough energy to 'flip' inside the region. This fact 
 holds true for late time which will later be confirmed with a numerical analysis. In order to estimate when the second pendulum will 'flip', I will create
 a fractal map. For now, we will first familiarize ourselves with the systems behavior.
   </p>
 
   <h3 style="margin: 0%; text-decoration: underline;">
-    Numerical Analysis
+    Numerical Analysis/Simulation
   </h3>
   <p style="text-indent: 30px;">
    To start my analysis, I have numerically solved the equations of motion for a simple initial condition: \(\theta_1=\theta_2=\frac{\pi}{2} \).
@@ -240,9 +240,11 @@ a fractal map. For now, we will first familiarize ourselves with the systems beh
   </video>
   $$ $$
 
-  Clearly, we can see that this system is chaotic; however, one might question if the trajectory would be drastically effected if we
-  give the initial conditions an extremely small perturbation? To prove that this system is chaotic and extremely dependent on initial conditions, I will re-run the 
-  simulation, but with another pendulum slightly perturbed. I will keep the same angle \(\theta_1 \); however, I will add the perturbation \(\epsilon = 0.01 \). Hence, \(\theta_2 = \frac{\pi}{2}+\epsilon \).
+  Clearly, we can see that this system is chaotic; however, one might question if the pendulum's trajectory would evolve noticeably different if we
+  give the initial conditions a small perturbation? To prove that this system is chaotic and sensitive to initial conditions, I will re-run the 
+  simulation, but with another double pendulum slightly perturbed. I will keep the same angle \(\theta_1 \); however, I will add the perturbation \(\epsilon = 0.01 \) radians
+  to \( \theta_2 \).
+  Hence, \(\theta_2 = \frac{\pi}{2}+\epsilon \). The results are as follows:
 
   $$
   $$
@@ -251,6 +253,58 @@ a fractal map. For now, we will first familiarize ourselves with the systems beh
     <source src="DoublePendulumPerturbationAnimationx4.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
+
+  $$
+  $$
+
+  As predicted, the pendulums begin on similar trajectories but then quickly (in finite time) deviate paths. 
+  <em> THIS IS CHAOS IN ONE OF ITS PUREST FORMS. </em> As an engineering exercise, I have decided to 
+  'validate' (more of a sanity check) this numerical model in MATLAB by using Autodesk Inventor's 
+  'Dynamic Simulation' environment. For this brief exercise, please note that I have changed the model to match the 
+  inspiration article. To start, I designed each component of the final assembly: two arms and two pins. Then I brought each 
+  component into an assembly file to complete the double pendulum. Finally, I brought the assembly into the dynamic simulation
+  environment, applied rigid body constraints/forces, set the initial conditions, and then let the simulation run. Here are the 
+  results:
+
+  $$$$
+  <video width="75%" style="margin-left: 12.5%;" controls>
+    <source src="DoublePendulumTrace.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  $$$$
+
+  As we can see, Autodesk Inventor's model behaves similar to our numerical model despite their respective moments of
+  inertia being different. (**side note: I am currently building this model**). Now that we have established that the double pendulum 
+  is a chaotic system, I will attempt to make order of this chaos using fractal maps. The goal here is to determine if the second
+  pendulum will flip within some time domain: let's say \( t\in [0-25s] \). If the second pendulum does flip within the domain,
+   its initial data will get saved. Clearly, this is just a matter of initial conditions; hence, our map will be \(\theta_1 \) 
+  vs \(\theta_2 \). The numerical appraoch is as follows: create two arrays of \(\theta_1\) and \(\theta_2\) values, numerically 
+  simulate the double pendulum for each pair of initial conditions (\(\theta_1\) and \(\theta_2)\), create a contour plot where 'time'
+  is the domain we are contouring. 
+
+  <div style="text-align: center;">
+    <img src="DoublePendulumFractal1MGP.jpg" style="width: 99%;">
+  </div>
+
+  The figure above is my fractal map of the system (~10 million grid points using parallel computing). I claim that this map accurately captures the chaotic nature of our system,
+  but displays well-defined features/patterns that give more valuable insight into predicting results. As we can see, there is a 
+  large island with a pair of buds. This regime (marked in black) is where the pendulum does not flip. The other colors (orange - red)
+  represent the time at which the second pendulum does flip. Since the buds branching off of the island were not predicted by 
+  the energetics map, I will investigate.
+
+  <div style="text-align: center;">
+    <img src="DoublePendulumFractalBud.jpg" style="width: 99%;">
+  </div>
+
+  $$$$
+  <div style="text-align: center;">
+  <video width="95%" style="margin-left: 0%;" controls>
+    <source src="DoublePendulumFractalYT4.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  </div>
+  $$$$
+
   </p>
 
 

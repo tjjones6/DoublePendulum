@@ -21,8 +21,8 @@ m1 = 1.0;  % Mass of the first pendulum bob (kg)
 m2 = 1.0;  % Mass of the second pendulum bob (kg)
 
 % Initial Conditions
-theta1_0 = 2;  % Initial angle of the first pendulum (radians)
-theta2_0 = 1.5;  % Initial angle of the second pendulum (radians)
+theta1_0 = -3.05;  % Initial angle of the first pendulum (radians)
+theta2_0 = -0.18;  % Initial angle of the second pendulum (radians)
 omega1_0 = 0;      % Initial angular velocity of the first pendulum (rad/s)
 omega2_0 = 0;      % Initial angular velocity of the second pendulum (rad/s)
 
