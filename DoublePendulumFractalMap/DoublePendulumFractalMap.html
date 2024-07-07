@@ -1,0 +1,398 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>DoublePendulumFractalMap</title>
+<meta name="generator" content="MATLAB 23.2">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2024-07-07">
+<meta name="DC.source" content="DoublePendulumFractalMap.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<h2>Contents</h2>
+<div>
+<ul>
+<li>
+<a href="#1">Double Pendulum Fractal Map</a>
+</li>
+<li>
+<a href="#2">User Input</a>
+</li>
+<li>
+<a href="#3">Numerical Integration using ODE45</a>
+</li>
+<li>
+<a href="#4">Plotting Results</a>
+</li>
+<li>
+<a href="#5">Define the function for the double pendulum ODEs</a>
+</li>
+<li>
+<a href="#6">Event function to stop the integration after pendulum flips</a>
+</li>
+<li>
+<a href="#7">Reference Functions for Plotting</a>
+</li>
+</ul>
+</div>
+<h2 id="1">Double Pendulum Fractal Map</h2>
+<p>Author: Tyler Jones Contact: <a href="mailto:tjjones6@wisc.edu">tjjones6@wisc.edu</a> Institution: University of Wisconsin-Madison Date: 05.27.2024</p>
+<p>Description: This script simulates a double pendulum system and generates a fractal map that illustrates the behavior of the system for various initial conditions. The simulation uses the ODE45 solver to numerically integrate the equations of motion, capturing the time at which the second pendulum flips. The resulting data is visualized in a heatmap, where each point represents the time of the flip for a specific set of initial angles.</p>
+<p>Analysis: <a href="https://tjjones6.github.io/DoublePendulum/">https://tjjones6.github.io/DoublePendulum/</a>
+</p>
+<pre class="codeinput">close <span class="string">all</span>; clear <span class="string">all</span>; clc;
+</pre>
+<h2 id="2">User Input</h2>
+<pre class="codeinput">g = 9.80665;  <span class="comment">% Acceleration due to gravity (m/s^2)</span>
+L1 = 1.0;        <span class="comment">% Length of the first pendulum arm (m)</span>
+L2 = 1.0;        <span class="comment">% Length of the second pendulum arm (m)</span>
+m1 = 1.0;       <span class="comment">% Mass of the first pendulum bob (kg)</span>
+m2 = 1.0;       <span class="comment">% Mass of the second pendulum bob (kg)</span>
+
+<span class="comment">% Initial Conditions</span>
+fidelity = 250; <span class="comment">% Controls the number of gridpoints</span>
+theta1 = linspace(-pi,pi,fidelity);  <span class="comment">% Initial angle of the first pendulum (radians)</span>
+theta2 = linspace(-pi,pi,fidelity);  <span class="comment">% Initial angle of the second pendulum (radians)</span>
+omega1_0 = 0;  <span class="comment">% Initial angular velocity of the first pendulum (rad/s)</span>
+omega2_0 = 0;  <span class="comment">% Initial angular velocity of the second pendulum (rad/s)</span>
+
+<span class="comment">% Time Span of Simulation</span>
+t_final = 25; <span class="comment">% (s)</span>
+tspan = [0 t_final];
+</pre>
+<h2 id="3">Numerical Integration using ODE45</h2>
+<pre class="codeinput">
+<span class="comment">% Initialize a matrix to store the flip times</span>
+flipTimes = NaN(fidelity, fidelity);
+
+<span class="comment">% WARNING: Must have the parallel computing toolbox installed. Otherwise</span>
+<span class="comment">% replace 'parfor' with 'for' loop</span>
+tic <span class="comment">% Not needed, but keeps track of how long the code runs</span>
+<span class="keyword">parfor</span> i = 1:fidelity
+
+    <span class="comment">% Uncomment below if using a simple for loop</span>
+    <span class="comment">% clc</span>
+    <span class="comment">% fprintf('Map Completed: %.2f%%\n', i/fidelity*100)</span>
+
+    <span class="keyword">for</span> j = 1:fidelity
+        <span class="comment">% Set initial conditions for the current pair of angles</span>
+        IC = [theta1(i), omega1_0, theta2(j), omega2_0];
+
+        <span class="comment">% Use ODE45 to integrate until the event (flip) occurs</span>
+        options = odeset(<span class="string">'RelTol'</span>, 1e-6, <span class="string">'AbsTol'</span>, 1e-6, <span class="string">'Events'</span>, @stopEvent);
+        [~, ~, t_event, ~, ~] = ode45(@(t, y) doublePendulumODE(t, y, g, L1, L2, m1, m2), tspan, IC, options);
+
+        <span class="comment">% Store the time of the event (flip) if it occurred</span>
+        <span class="keyword">if</span> ~isempty(t_event)
+            flipTimes(i, j) = t_event(1);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+toc
+</pre>
+<pre class="codeoutput">Elapsed time is 89.751643 seconds.
+</pre>
+<h2 id="4">Plotting Results</h2>
+<pre class="codeinput">
+<span class="comment">% Set NaN values to a specific number outside the range of normal flip times</span>
+flipTimesWithNaN = flipTimes;
+flipTimesWithNaN(isnan(flipTimes)) = NaN;
+
+<span class="comment">% Transpose the data to correct orientation if necessary</span>
+flipTimesWithNaN = flipTimesWithNaN';
+
+<span class="comment">% Create a custom colormap</span>
+cmap = colormap(jet);
+cmap = [0 0 0; cmap];  <span class="comment">% Add black color for NaN values</span>
+
+<span class="comment">% Plotting the fractal map using a heatmap</span>
+figure(<span class="string">'units'</span>,<span class="string">'normalized'</span>,<span class="string">'Position'</span>,[0.1 0.1 .8 .8])
+myfigpref
+hold <span class="string">on</span>; axis <span class="string">tight</span>; axis <span class="string">equal</span>;
+imagesc(theta1, theta2, flipTimesWithNaN)
+colormap(cmap); colorbar;
+clim([-1 max(flipTimes(:))]);  <span class="comment">% Set color axis to include the special NaN value</span>
+fig_xytit(<span class="string">'$\theta_1$ [rad]'</span>,<span class="string">'$\theta_2$ [rad]'</span>,<span class="string">'Double Pendulum Fractal'</span>)
+hold <span class="string">off</span>
+</pre>
+<h2 id="5">Define the function for the double pendulum ODEs</h2>
+<pre class="codeinput">
+<span class="keyword">function</span> dydt = doublePendulumODE(~, y, g, L1, L2, m1, m2)
+    <span class="comment">% Unpack the state variables</span>
+    theta1 = y(1);
+    omega1 = y(2);
+    theta2 = y(3);
+    omega2 = y(4);
+
+    <span class="comment">% Store equations of motion</span>
+    dydt = zeros(4, 1);
+    dydt(1) = omega1;
+    dydt(2) = (-g * (2 * m1 + m2) * sin(theta1) - m2 * g * sin(theta1 - 2 * theta2) - 2 * sin(theta1 - theta2) * m2 * (omega2^2 * L2 + omega1^2 * L1 * cos(theta1 - theta2))) / (L1 * (2 * m1 + m2 - m2 * cos(2 * theta1 - 2 * theta2)));
+    dydt(3) = omega2;
+    dydt(4) = (2 * sin(theta1 - theta2) * (omega1^2 * L1 * (m1 + m2) + g * (m1 + m2) * cos(theta1) + omega2^2 * L2 * m2 * cos(theta1 - theta2))) / (L2 * (2 * m1 + m2 - m2 * cos(2 * theta1 - 2 * theta2)));
+<span class="keyword">end</span>
+</pre>
+<h2 id="6">Event function to stop the integration after pendulum flips</h2>
+<pre class="codeinput">
+<span class="keyword">function</span> [value, isterminal, direction] = stopEvent(~, y)
+    theta2 = y(3);  <span class="comment">% Angle of the second pendulum</span>
+    value = abs(theta2) - 2*pi;  <span class="comment">% Condition for the event</span>
+    isterminal = 1;  <span class="comment">% Stop the integration</span>
+    direction = 0;  <span class="comment">% Detect both increasing and decreasing directions</span>
+<span class="keyword">end</span>
+</pre>
+<h2 id="7">Reference Functions for Plotting</h2>
+<pre class="codeinput">
+<span class="comment">% Barrowed from T.G.J. Chandler @UW-Madison Mathematics</span>
+<span class="keyword">function</span> myfigpref
+    set(0, <span class="string">'DefaultAxesFontSize'</span>, 20);
+    set(0, <span class="string">'DefaultAxesLineWidth'</span>, 2);
+    set(0, <span class="string">'DefaultLineLineWidth'</span>, 2);
+    set(0, <span class="string">'DefaultPatchLineWidth'</span>, .7);
+    set(0, <span class="string">'DefaultLineMarkerSize'</span>, 6);
+    grid <span class="string">on</span>;
+    box <span class="string">on</span>;
+    h = gca;
+    h.TickLabelInterpreter=<span class="string">'latex'</span>;
+    h.MinorGridAlpha=0.05;
+    h.GridAlpha=0.05;
+    h.FontSize=25;
+    h.LineWidth=2;
+    h = gcf;
+    h.Color = [1,1,1];
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> fig_xytit(xlab, ylab, tit)
+    <span class="keyword">if</span> nargin &lt; 3
+        tit = <span class="string">''</span>;
+    <span class="keyword">end</span>
+    xlabel(xlab, <span class="string">'interpreter'</span>, <span class="string">'latex'</span>);
+    ylabel(ylab, <span class="string">'interpreter'</span>, <span class="string">'latex'</span>);
+    title(tit, <span class="string">'interpreter'</span>, <span class="string">'latex'</span>);
+<span class="keyword">end</span>
+</pre>
+<img vspace="5" hspace="5" src="DoublePendulumFractalMap_01.png" alt=""> <p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023b</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+%% Double Pendulum Fractal Map
+% Author: Tyler Jones
+% Contact: tjjones6@wisc.edu
+% Institution: University of Wisconsin-Madison
+% Date: 05.27.2024
+%
+% Description: 
+% This script simulates a double pendulum system and generates a fractal map
+% that illustrates the behavior of the system for various initial conditions.
+% The simulation uses the ODE45 solver to numerically integrate the equations 
+% of motion, capturing the time at which the second pendulum flips.
+% The resulting data is visualized in a heatmap, where each point represents 
+% the time of the flip for a specific set of initial angles.
+%
+% Analysis:
+% <https://tjjones6.github.io/DoublePendulum/> 
+
+close all; clear all; clc;
+
+%% User Input
+g = 9.80665;  % Acceleration due to gravity (m/s^2)
+L1 = 1.0;        % Length of the first pendulum arm (m)
+L2 = 1.0;        % Length of the second pendulum arm (m)
+m1 = 1.0;       % Mass of the first pendulum bob (kg)
+m2 = 1.0;       % Mass of the second pendulum bob (kg)
+
+% Initial Conditions
+fidelity = 250; % Controls the number of gridpoints
+theta1 = linspace(-pi,pi,fidelity);  % Initial angle of the first pendulum (radians)
+theta2 = linspace(-pi,pi,fidelity);  % Initial angle of the second pendulum (radians)
+omega1_0 = 0;  % Initial angular velocity of the first pendulum (rad/s)
+omega2_0 = 0;  % Initial angular velocity of the second pendulum (rad/s)
+
+% Time Span of Simulation
+t_final = 25; % (s)
+tspan = [0 t_final];
+
+%% Numerical Integration using ODE45
+
+% Initialize a matrix to store the flip times
+flipTimes = NaN(fidelity, fidelity);
+
+% WARNING: Must have the parallel computing toolbox installed. Otherwise
+% replace 'parfor' with 'for' loop
+tic % Not needed, but keeps track of how long the code runs
+parfor i = 1:fidelity
+        
+    % Uncomment below if using a simple for loop
+    % clc
+    % fprintf('Map Completed: %.2f%%\n', i/fidelity*100)
+
+    for j = 1:fidelity
+        % Set initial conditions for the current pair of angles
+        IC = [theta1(i), omega1_0, theta2(j), omega2_0];
+
+        % Use ODE45 to integrate until the event (flip) occurs
+        options = odeset('RelTol', 1e-6, 'AbsTol', 1e-6, 'Events', @stopEvent);
+        [~, ~, t_event, ~, ~] = ode45(@(t, y) doublePendulumODE(t, y, g, L1, L2, m1, m2), tspan, IC, options);
+
+        % Store the time of the event (flip) if it occurred
+        if ~isempty(t_event)
+            flipTimes(i, j) = t_event(1);
+        end
+    end
+end
+toc
+
+%% Plotting Results
+
+% Set NaN values to a specific number outside the range of normal flip times
+flipTimesWithNaN = flipTimes;
+flipTimesWithNaN(isnan(flipTimes)) = NaN;
+
+% Transpose the data to correct orientation if necessary
+flipTimesWithNaN = flipTimesWithNaN';
+
+% Create a custom colormap
+cmap = colormap(jet);
+cmap = [0 0 0; cmap];  % Add black color for NaN values
+
+% Plotting the fractal map using a heatmap
+figure('units','normalized','Position',[0.1 0.1 .8 .8])
+myfigpref
+hold on; axis tight; axis equal;
+imagesc(theta1, theta2, flipTimesWithNaN)
+colormap(cmap); colorbar;
+clim([-1 max(flipTimes(:))]);  % Set color axis to include the special NaN value
+fig_xytit('$\theta_1$ [rad]','$\theta_2$ [rad]','Double Pendulum Fractal')
+hold off
+
+%% Define the function for the double pendulum ODEs
+
+function dydt = doublePendulumODE(~, y, g, L1, L2, m1, m2)
+    % Unpack the state variables
+    theta1 = y(1);
+    omega1 = y(2);
+    theta2 = y(3);
+    omega2 = y(4);
+
+    % Store equations of motion
+    dydt = zeros(4, 1);
+    dydt(1) = omega1;
+    dydt(2) = (-g * (2 * m1 + m2) * sin(theta1) - m2 * g * sin(theta1 - 2 * theta2) - 2 * sin(theta1 - theta2) * m2 * (omega2^2 * L2 + omega1^2 * L1 * cos(theta1 - theta2))) / (L1 * (2 * m1 + m2 - m2 * cos(2 * theta1 - 2 * theta2)));
+    dydt(3) = omega2;
+    dydt(4) = (2 * sin(theta1 - theta2) * (omega1^2 * L1 * (m1 + m2) + g * (m1 + m2) * cos(theta1) + omega2^2 * L2 * m2 * cos(theta1 - theta2))) / (L2 * (2 * m1 + m2 - m2 * cos(2 * theta1 - 2 * theta2)));
+end
+
+%% Event function to stop the integration after pendulum flips
+
+function [value, isterminal, direction] = stopEvent(~, y)
+    theta2 = y(3);  % Angle of the second pendulum
+    value = abs(theta2) - 2*pi;  % Condition for the event
+    isterminal = 1;  % Stop the integration
+    direction = 0;  % Detect both increasing and decreasing directions
+end
+
+%% Reference Functions for Plotting
+
+% Barrowed from T.G.J. Chandler @UW-Madison Mathematics
+function myfigpref
+    set(0, 'DefaultAxesFontSize', 20);
+    set(0, 'DefaultAxesLineWidth', 2);
+    set(0, 'DefaultLineLineWidth', 2);
+    set(0, 'DefaultPatchLineWidth', .7);
+    set(0, 'DefaultLineMarkerSize', 6);
+    grid on;
+    box on;
+    h = gca;
+    h.TickLabelInterpreter='latex';
+    h.MinorGridAlpha=0.05;
+    h.GridAlpha=0.05;
+    h.FontSize=25;
+    h.LineWidth=2;
+    h = gcf;
+    h.Color = [1,1,1];
+end
+
+function fig_xytit(xlab, ylab, tit)
+    if nargin < 3
+        tit = '';
+    end
+    xlabel(xlab, 'interpreter', 'latex');
+    ylabel(ylab, 'interpreter', 'latex');
+    title(tit, 'interpreter', 'latex');
+end
+
+##### SOURCE END #####
+-->
+</body>
+</html>
